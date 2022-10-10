@@ -1,0 +1,22 @@
+We refer to the first five bytes of the record (comprising the ’MagicNo’, ’Type’ and
+’FilenameLen’ fields) as the fixed header. The FileRequest record is being sent from
+the client to the server. To receive and process a FileRequest record the server performs
+the following steps:
+• First the server attempts to read the five bytes of the fixed header into a byte array.
+If that is not possible without gap (see below), then the server concludes that
+the received FileRequest is erroneous and performs error processing as described
+in Section 3.1 (i.e. printing an error message on the terminal, closing the socket
+obtained from accept() and going back to the start of the loop). If this is possible,
+then the server performs the following checks:
+– The contents of the ’MagicNo’ field must equal 0x497E.
+– The contents of the ’Type’ field must equal 1.
+– The contents of the ’FilenameLen’ field must be at least one and must not be
+larger than 1,024.
+If any of these conditions is not true, then the server concludes that the received
+FileRequest is erroneous and performs error processing.
+• Then the server attempts to read exactly n further bytes from the FileRequest
+record. These bytes are read into a byte array. If reading from the socket is not
+possible without gap (see Section 3.4), then the server concludes that the received
+FileRequest is erroneous and performs error processing as above. If the server
+reads fewer than n bytes or more than n bytes, then again the server concludes
+that processing failed and performs error processing.
